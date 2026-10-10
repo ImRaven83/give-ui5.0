@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"io"
 	"spt-give-ui/backend/http"
+	"spt-give-ui/backend/shuffle"
 )
 
 func GetJson(url string, sessionId string, target interface{}) error {
@@ -27,7 +28,7 @@ func GetRawBytes(url string, sessionId string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	frame, err := deshuffleFrame(shuffled)
+	frame, err := shuffle.Deshuffle(shuffled)
 	if err != nil {
 		return nil, err
 	}

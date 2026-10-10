@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"spt-give-ui/backend/shuffle"
 	"time"
 )
 
@@ -42,7 +43,10 @@ func DoPost(url string, sessionId string, body interface{}) (*http.Response, err
 	if err != nil {
 		return nil, err
 	}
-	req, err := http.NewRequest("POST", url, bytes.NewReader(jsonBody))
+	// SPT 5.0 unconditionally expects POST/PUT bodies on non-exempt routes
+	// (anything other than /launcher, /client/metadata, /v2/shop, /files) to
+	// arrive pre-shuffled, independent of the requestcompressed header below.
+	req, err := http.NewRequest("POST", url, bytes.NewReader(shuffle.Shuffle(jsonBody)))
 	if err != nil {
 		return nil, err
 	}
