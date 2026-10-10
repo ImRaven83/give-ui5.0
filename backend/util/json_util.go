@@ -1,10 +1,12 @@
 package util
 
 import (
+	"bytes"
 	"compress/zlib"
 	"encoding/json"
 	"io"
 	"spt-give-ui/backend/http"
+	"spt-give-ui/backend/shuffle"
 )
 
 func GetJson(url string, sessionId string, target interface{}) error {
@@ -22,7 +24,16 @@ func GetRawBytes(url string, sessionId string) ([]byte, error) {
 	}
 	defer r.Body.Close()
 
-	reader, err := zlib.NewReader(r.Body)
+	shuffled, err := io.ReadAll(r.Body)
+	if err != nil {
+		return nil, err
+	}
+	frame, err := shuffle.Deshuffle(shuffled)
+	if err != nil {
+		return nil, err
+	}
+
+	reader, err := zlib.NewReader(bytes.NewReader(frame))
 	if err != nil {
 		return nil, err
 	}
